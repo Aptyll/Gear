@@ -28,9 +28,9 @@ let player = {
     speed: 2,
     gear: {
         helmet: null,
-        shoulder: null,
-        leg: null,
-        boot: null
+        chest: null,
+        legs: null,
+        boots: null
     }
 };
 
@@ -40,26 +40,15 @@ class GearPiece {
         this.slot = slot;
         this.rarity = rarity;
         this.color = COLORS[rarity];
-        this.glowIntensity = 0;
-        this.glowIncreasing = true;
+        this.glowIntensity = 0.5;  
     }
 
     updateGlow() {
-        if (this.rarity === 'legendary') {
-            if (this.glowIncreasing) {
-                this.glowIntensity += 0.05;
-                if (this.glowIntensity >= 1) {
-                    this.glowIntensity = 1;
-                    this.glowIncreasing = false;
-                }
-            } else {
-                this.glowIntensity -= 0.05;
-                if (this.glowIntensity <= 0.3) {
-                    this.glowIntensity = 0.3;
-                    this.glowIncreasing = true;
-                }
-            }
-        }
+        this.glowIntensity = 0.5;
+    }
+
+    getGlowStyle() {
+        return `0 0 10px ${this.color}`;
     }
 }
 
@@ -75,50 +64,47 @@ function drawBackground() {
 
 // Draw player and gear
 function drawPlayer() {
-    // Draw base player
-    ctx.fillStyle = COLORS.player;
-    ctx.fillRect(player.x, player.y, PLAYER_SIZE, PLAYER_SIZE);
-
-    // Calculate center point for dividing the square
     const centerX = player.x + PLAYER_SIZE / 2;
     const centerY = player.y + PLAYER_SIZE / 2;
 
-    // Draw equipped gear as quadrants
+    // Draw base player color
+    ctx.fillStyle = COLORS.player;
+    ctx.fillRect(player.x, player.y, PLAYER_SIZE, PLAYER_SIZE);
+
+    // Draw gear pieces with glow
     Object.entries(player.gear).forEach(([slot, gear]) => {
         if (gear) {
-            // Set up glow effect for legendary items
-            if (gear.rarity === 'legendary') {
-                ctx.shadowColor = gear.color;
-                ctx.shadowBlur = 10 + (gear.glowIntensity * 5);
-            }
-
+            // Set base color
             ctx.fillStyle = gear.color;
             
-            // Draw gear as quadrants based on slot
+            // Add simple glow effect
+            if (gear.rarity !== 'common') {
+                ctx.shadowColor = gear.color;
+                ctx.shadowBlur = 10;
+            } else {
+                ctx.shadowBlur = 0;
+            }
+
+            // Draw gear quadrants
             switch(slot) {
                 case 'helmet':
-                    // Top-left quadrant
                     ctx.fillRect(player.x, player.y, PLAYER_SIZE/2, PLAYER_SIZE/2);
                     break;
-                case 'shoulder':
-                    // Top-right quadrant
+                case 'chest':
                     ctx.fillRect(centerX, player.y, PLAYER_SIZE/2, PLAYER_SIZE/2);
                     break;
-                case 'leg':
-                    // Bottom-left quadrant
+                case 'legs':
                     ctx.fillRect(player.x, centerY, PLAYER_SIZE/2, PLAYER_SIZE/2);
                     break;
-                case 'boot':
-                    // Bottom-right quadrant
+                case 'boots':
                     ctx.fillRect(centerX, centerY, PLAYER_SIZE/2, PLAYER_SIZE/2);
                     break;
             }
-            
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
         }
     });
+
+    // Reset shadow for other drawing
+    ctx.shadowBlur = 0;
 
     // Draw dividing lines for visual clarity
     ctx.strokeStyle = '#333';
@@ -155,11 +141,7 @@ document.querySelectorAll('.gear-slot').forEach(slot => {
         
         // Update slot visual
         slot.style.borderColor = COLORS[randomRarity];
-        if (randomRarity === 'legendary') {
-            slot.style.boxShadow = `0 0 10px ${COLORS[randomRarity]}`;
-        } else {
-            slot.style.boxShadow = 'none';
-        }
+        slot.style.boxShadow = player.gear[slotType].getGlowStyle();
     });
 });
 
@@ -178,6 +160,17 @@ function gameLoop() {
     // Update gear effects
     Object.values(player.gear).forEach(gear => {
         if (gear) gear.updateGlow();
+    });
+    
+    // Update slot glow visuals
+    document.querySelectorAll('.gear-slot').forEach(slot => {
+        const slotType = slot.dataset.slot;
+        const gear = player.gear[slotType];
+        if (gear && gear.rarity !== 'common') {
+            slot.style.boxShadow = gear.getGlowStyle();
+        } else {
+            slot.style.boxShadow = 'none';
+        }
     });
     
     // Continue game loop
