@@ -8,6 +8,10 @@ const GEAR_SIZE = 10;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
+// DOM elements
+const gearPanel = document.getElementById('gearPanel');
+const toggleGearBtn = document.getElementById('toggleGear');
+
 const COLORS = {
     darkSquare: '#1a1a1a',
     lightSquare: '#2a2a2a',
@@ -119,7 +123,16 @@ function drawPlayer() {
 
 // Handle keyboard input
 const keys = {};
-document.addEventListener('keydown', (e) => keys[e.key] = true);
+document.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+    if (e.key.toLowerCase() === 'g') {
+        if (gearPanel.style.display === 'flex') {
+            gearPanel.style.display = 'none';
+        } else {
+            gearPanel.style.display = 'flex';
+        }
+    }
+});
 document.addEventListener('keyup', (e) => keys[e.key] = false);
 
 // Update player position
@@ -150,6 +163,15 @@ document.querySelectorAll('.gear-slot').forEach(slot => {
             slot.style.boxShadow = 'none';
         }
     });
+});
+
+// Toggle gear panel
+toggleGearBtn.addEventListener('click', () => {
+    if (gearPanel.style.display === 'flex') {
+        gearPanel.style.display = 'none';
+    } else {
+        gearPanel.style.display = 'flex';
+    }
 });
 
 // Game loop
