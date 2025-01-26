@@ -140,8 +140,15 @@ document.querySelectorAll('.gear-slot').forEach(slot => {
         player.gear[slotType] = new GearPiece(slotType, randomRarity);
         
         // Update slot visual
+        slot.style.backgroundColor = COLORS[randomRarity];
         slot.style.borderColor = COLORS[randomRarity];
-        slot.style.boxShadow = player.gear[slotType].getGlowStyle();
+        
+        // Add glow for non-common items
+        if (randomRarity !== 'common') {
+            slot.style.boxShadow = `0 0 10px ${COLORS[randomRarity]}`;
+        } else {
+            slot.style.boxShadow = 'none';
+        }
     });
 });
 
@@ -162,13 +169,25 @@ function gameLoop() {
         if (gear) gear.updateGlow();
     });
     
-    // Update slot glow visuals
+    // Update slot colors and glow
     document.querySelectorAll('.gear-slot').forEach(slot => {
         const slotType = slot.dataset.slot;
         const gear = player.gear[slotType];
-        if (gear && gear.rarity !== 'common') {
-            slot.style.boxShadow = gear.getGlowStyle();
+        
+        if (gear) {
+            // Fill slot with gear color
+            slot.style.backgroundColor = COLORS[gear.rarity];
+            
+            // Add glow for non-common items
+            if (gear.rarity !== 'common') {
+                slot.style.boxShadow = `0 0 10px ${COLORS[gear.rarity]}`;
+            } else {
+                slot.style.boxShadow = 'none';
+                slot.style.backgroundColor = COLORS.common;  // Reset to common color
+            }
         } else {
+            // Reset slot to default if no gear
+            slot.style.backgroundColor = '#2a2a2a';
             slot.style.boxShadow = 'none';
         }
     });
