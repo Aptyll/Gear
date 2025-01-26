@@ -25,19 +25,34 @@
             border-radius: 8px;
             border: 2px solid #333;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            width: 165px;
+            height: 165px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
         }
         .gear-slot {
-            width: 50px;
-            height: 50px;
+            width: 75px;
+            height: 75px;
             background: #2a2a2a;
             border: 2px solid #333;
-            margin: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+        }
+        .gear-slot:last-child {
+            margin-bottom: 0;
         }
         .gear-slot:hover {
             border-color: #444;
             background: #3a3a3a;
+        }
+        .slot-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 165px;
         }
         canvas {
             border: 2px solid #333;
@@ -48,10 +63,14 @@
 <body>
     <div class="game-container">
         <div class="gear-panel">
-            <div class="gear-slot" data-slot="helmet"></div>
-            <div class="gear-slot" data-slot="shoulder"></div>
-            <div class="gear-slot" data-slot="leg"></div>
-            <div class="gear-slot" data-slot="boot"></div>
+            <div class="slot-column">
+                <div class="gear-slot" id="helmet-slot" data-slot="helmet"></div>
+                <div class="gear-slot" id="legs-slot" data-slot="legs"></div>
+            </div>
+            <div class="slot-column">
+                <div class="gear-slot" id="chest-slot" data-slot="chest"></div>
+                <div class="gear-slot" id="boots-slot" data-slot="boots"></div>
+            </div>
         </div>
         <canvas id="gameCanvas"></canvas>
     </div>
